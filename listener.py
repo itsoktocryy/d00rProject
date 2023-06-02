@@ -53,7 +53,7 @@ class Listener:
                 if command == "exit":
                     break
                 elif command == "clear":
-                    print(" " * 2000)
+                    os.system('cls' if os.name == 'nt' else 'clear')
                 elif command.split()[0] == "download":
                     result = self.execute_remotely(command)
                     if "[-] Error" not in result:
